@@ -4,12 +4,22 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 25px;
+  
 
   .logo-container {
-    margin-left:70px;
+    display: flex;
+    margin-left: 70px;
     height: 100%;
-    width: 70px;
+    width: 300px;
     padding: 25px;
+    align-items: center;
+  }
+
+  .logo-text {
+    font-family: "Cookie", cursive;
+    font-size: 52px;
+    margin-left: 10px;
+    margin-top: 5px;
   }
 
   .options {
