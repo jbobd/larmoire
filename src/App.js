@@ -12,6 +12,10 @@ import SignInAndSignUpPage from "./pages/sign-in-and-sign-up/sign-in-and-sign-up
 
 import Header from "./components/header/header.component";
 
+//For adding out collection data into firebase
+//import { auth, createUserProfileDocument, addCollectionAndDocuments } from "./firebase/firebase.utils";
+//import { selectCollectionsForPreview } from "./redux/shop/shop.selectors";
+
 import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
 
 import { setCurrentUser } from "./redux/user/user.actions";
@@ -21,7 +25,9 @@ class App extends React.Component {
   unsubscribeFromAuth = null;
 
   componentDidMount() {
-    const { setCurrentUser } = this.props;
+    //For adding out collection data into firebase
+    //const { setCurrentUser, collectionsArray  } = this.props;
+    const { setCurrentUser  } = this.props;
 
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
       if (userAuth) {
@@ -37,6 +43,8 @@ class App extends React.Component {
         });
       }
       setCurrentUser(userAuth);
+      //For adding out collection data into firebase
+      //addCollectionAndDocuments('collections',collectionsArray.map(({title, items})=> ({title,items})));
     });
   }
 
@@ -71,6 +79,9 @@ class App extends React.Component {
   }
 }
 
+//For adding out collection data into firebase
+//add:
+//collectionsArray: selectCollectionsForPreview
 const mapStateToProps = createStructuredSelector({
   currentUser: selectCurrentUser
 });
