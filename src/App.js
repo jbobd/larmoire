@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
@@ -21,20 +21,14 @@ import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
 import { setCurrentUser } from "./redux/user/user.actions";
 import { selectCurrentUser } from "./redux/user/user.selectors";
 
-class App extends React.Component {
-  unsubscribeFromAuth = null;
-
-  componentDidMount() {
-    //For adding out collection data into firebase
-    //const { setCurrentUser, collectionsArray  } = this.props;
-    const { setCurrentUser  } = this.props;
-
-    this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+const App = ({ currentUser, setCurrentUser }) => {
+  useEffect(() => {
+    const unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
       if (userAuth) {
         const userRef = await createUserProfileDocument(userAuth);
-
         userRef.onSnapshot(snapShot => {
           setCurrentUser({
+            
             currentUser: {
               id: snapShot.id,
               ...snapShot.data()
@@ -43,45 +37,40 @@ class App extends React.Component {
         });
       }
       setCurrentUser(userAuth);
-      //For adding out collection data into firebase
-      //addCollectionAndDocuments('collections',collectionsArray.map(({title, items})=> ({title,items})));
     });
-  }
+    return () => {
+    unsubscribeFromAuth();
+    }
+  }, [setCurrentUser]);
 
-  componentWillUnmount() {
-    this.unsubscribeFromAuth();
-  }
 
-  //without redux:
-  //<Header currentUser={this.state.currentUser} />
-  render() {
-    return (
-      <div>
-        <Header />
-        <Switch>
-          <Route exact path="/" component={HomePage} />
-          <Route path="/shop" component={ShopPage} />
-          <Route exact path="/checkout" component={CheckoutPage} />
-          <Route
-            exact
-            path="/signin"
-            render={() =>
-              this.props.currentUser ? (
-                <Redirect to="/" />
-              ) : (
-                <SignInAndSignUpPage />
-              )
-            }
-          />
-        </Switch>
-      </div>
-    );
-  }
-}
+  // componentWillUnmount() {
+  //   this.unsubscribeFromAuth();
+  // }
 
-//For adding out collection data into firebase
-//add:
-//collectionsArray: selectCollectionsForPreview
+  return (
+    <div>
+      <Header />
+      <Switch>
+        <Route exact path="/" component={HomePage} />
+        <Route path="/shop" component={ShopPage} />
+        <Route exact path="/checkout" component={CheckoutPage} />
+        <Route
+          exact
+          path="/signin"
+          render={() =>
+            currentUser ? <Redirect to="/" /> : <SignInAndSignUpPage />
+          }
+        />
+      </Switch>
+    </div>
+  );
+
+  //For adding out collection data into firebase
+  //add:
+  //collectionsArray: selectCollectionsForPreview
+};
+
 const mapStateToProps = createStructuredSelector({
   currentUser: selectCurrentUser
 });
