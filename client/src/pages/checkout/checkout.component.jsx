@@ -41,7 +41,7 @@ const CheckoutPage = ({ cartItems, total, clearCart }) => (
     <div className="test-warning">
       *Please use the following credit card for payments:
       <br />
-      4242 4242 4242 4242 exp. date: 01/01 - CVV: 123
+      4242 4242 4242 4242 exp. date: 01/21 - CVV: 123
     </div>
     <div className="payclear-buttons">
       <CustomButton className="clear-button" onClick={() => clearCart()}>Clear cart</CustomButton>
