@@ -1,7 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
-import { connect } from "react-redux";
-import { createStructuredSelector } from "reselect";
 
 import "./App.css";
 
@@ -12,45 +10,38 @@ import SignInAndSignUpPage from "./pages/sign-in-and-sign-up/sign-in-and-sign-up
 
 import Header from "./components/header/header.component";
 
-//For adding out collection data into firebase
-//import { auth, createUserProfileDocument, addCollectionAndDocuments } from "./firebase/firebase.utils";
-//import { selectCollectionsForPreview } from "./redux/shop/shop.selectors";
-
 import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
 
-import { setCurrentUser } from "./redux/user/user.actions";
-import { selectCurrentUser } from "./redux/user/user.selectors";
+import CurrentUserContext from "./contexts/current-user/current-user.context";
 
-const App = ({ currentUser, setCurrentUser }) => {
+const App = () => {
+
+  const [currentUser, setCurrentUser] = useState(null);
   useEffect(() => {
-    const unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+    const unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
       if (userAuth) {
         const userRef = await createUserProfileDocument(userAuth);
-        userRef.onSnapshot(snapShot => {
-          setCurrentUser({
-            
+        userRef.onSnapshot((snapShot) => {
+            setCurrentUser({
             currentUser: {
               id: snapShot.id,
-              ...snapShot.data()
-            }
+              ...snapShot.data(),
+            },
           });
         });
       }
       setCurrentUser(userAuth);
     });
     return () => {
-    unsubscribeFromAuth();
-    }
+      unsubscribeFromAuth();
+    };
   }, [setCurrentUser]);
-
-
-  // componentWillUnmount() {
-  //   this.unsubscribeFromAuth();
-  // }
 
   return (
     <div>
-      <Header />
+      <CurrentUserContext.Provider value={currentUser}>
+        <Header />
+      </CurrentUserContext.Provider>
       <Switch>
         <Route exact path="/" component={HomePage} />
         <Route path="/shop" component={ShopPage} />
@@ -65,18 +56,6 @@ const App = ({ currentUser, setCurrentUser }) => {
       </Switch>
     </div>
   );
-
-  //For adding out collection data into firebase
-  //add:
-  //collectionsArray: selectCollectionsForPreview
 };
 
-const mapStateToProps = createStructuredSelector({
-  currentUser: selectCurrentUser
-});
-
-const mapDispatchToProps = dispatch => ({
-  setCurrentUser: user => dispatch(setCurrentUser(user))
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default App;

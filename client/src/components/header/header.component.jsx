@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 
@@ -10,46 +10,45 @@ import CartDropdown from "../cart-dropdown/cart-dropdown.component";
 import { selectCartHidden } from "../../redux/cart/cart.selectors";
 import { selectCurrentUser } from "../../redux/user/user.selectors";
 
+import CurrentUserContext from "../../contexts/current-user/current-user.context";
+
 import {
   HeaderContainer,
   LogoContainer,
   LogoTextContainer,
   OptionsContainer,
-  OptionLink
+  OptionLink,
 } from "./header.styles";
 
-const Header = ({ currentUser, hidden }) => (
-  <HeaderContainer>
-    <LogoContainer to="/">
-      <Logo className="logo" />
-      <LogoTextContainer>L' Armoire</LogoTextContainer>
-    </LogoContainer>
-    <OptionsContainer>
-      <OptionLink to="/shop">
-        SHOP
-      </OptionLink>
-      <OptionLink to="/shop">
-        CONTACT
-      </OptionLink>
-      {currentUser ? (
-        <OptionLink as="div" onClick={() => auth.signOut()}>
-          SIGN OUT
-        </OptionLink>
-      ) : (
-        <OptionLink to="/signin">
-          SIGN IN
-        </OptionLink>
-      )}
-      <CartIcon />
-    </OptionsContainer>
-    {hidden ? null : <CartDropdown />}
-  </HeaderContainer>
-);
+const Header = ({ hidden }) => {
+  const currentUser = useContext(CurrentUserContext);
+  console.log(currentUser);
+  return (
+    <HeaderContainer>
+      <LogoContainer to="/">
+        <Logo className="logo" />
+        <LogoTextContainer>L' Armoire</LogoTextContainer>
+      </LogoContainer>
+      <OptionsContainer>
+        <OptionLink to="/shop">SHOP</OptionLink>
+        <OptionLink to="/shop">CONTACT</OptionLink>
+        {currentUser ? (
+          <OptionLink as="div" onClick={() => auth.signOut()}>
+            SIGN OUT
+          </OptionLink>
+        ) : (
+          <OptionLink to="/signin">SIGN IN</OptionLink>
+        )}
+        <CartIcon />
+      </OptionsContainer>
+      {hidden ? null : <CartDropdown />}
+    </HeaderContainer>
+  );
+};
 
 //createStructuredSelector evita pasar (state) como argumento a cada selector
 const mapStateToProps = createStructuredSelector({
-  currentUser: selectCurrentUser,
-  hidden: selectCartHidden
+  hidden: selectCartHidden,
 });
 
 export default connect(mapStateToProps)(Header);
